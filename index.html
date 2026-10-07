@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión Hawái: Salud Sexual & Obstetricia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- Tone.js for web audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #2ac6de 0%, #028090 40%, #f4a261 85%, #e76f51 100%);
+            min-height: 100vh;
+            color: #2b2d42;
+            overflow-x: hidden;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Glassmorphism & Tropical Cards */
+        .tropical-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 4px solid #f4a261;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-radius: 2rem;
+        }
+
+        .stitch-btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            border: 3px solid #caf0f8;
+            box-shadow: 0 6px 0 #03045e;
+            transition: all 0.1s ease;
+        }
+
+        .stitch-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #03045e;
+        }
+
+        .lilo-btn {
+            background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+            border: 3px solid #ffccd5;
+            box-shadow: 0 6px 0 #800f2f;
+            transition: all 0.1s ease;
+        }
+
+        .lilo-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #800f2f;
+        }
+
+        /* Waves background animation */
+        .wave {
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-400-50S155.5 56.9 0 56.9v31.8h800v-31.8z' fill='%2300b4d8' opacity='0.4'/%3E%3C/svg%3E");
+            position: absolute;
+            width: 200%;
+            height: 100px;
+            animation: wave 10s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Canvas game styling */
+        #gameCanvas {
+            background: linear-gradient(180deg, #caf0f8 0%, #90e0ef 50%, #00b4d8 100%);
+            border: 5px solid #e76f51;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.15);
+            border-radius: 1.5rem;
+        }
+
+        .hibiscus-bg {
+            background-image: radial-gradient(#ff4d6d 15%, transparent 16%), radial-gradient(#ffb703 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            opacity: 0.05;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col justify-between min-h-screen">
+    <!-- Floating Background Wave FX -->
+    <div class="fixed top-0 left-0 w-full pointer-events-none z-0 opacity-30">
+        <div class="wave"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="relative z-10 px-4 py-3 bg-teal-900/80 backdrop-blur-md text-white border-b-4 border-amber-400">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🌺</span>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold font-fredoka text-amber-300">MISIÓN HAWÁI</h1>
+                    <p class="text-xs text-teal-200">Obstetricia & Salud Sexual de la Mujer en Edad Fértil</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 md:gap-4">
+                <div class="bg-amber-500/30 px-3 py-1 rounded-full border border-amber-300/50 text-xs md:text-sm font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-users text-amber-300"></i>
+                    <span>2 Jugadoras</span>
+                </div>
+                <button onclick="toggleAudio()" id="audioBtn" class="bg-teal-700 hover:bg-teal-600 px-3 py-1 rounded-full border border-teal-400 text-xs md:text-sm flex items-center gap-2 transition">
+                    <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+                    <span class="hidden sm:inline">Sonido</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-center items-center">
+
+        <!-- SCREEN 1: WELCOME & INFORMATION PANEL -->
+        <div id="screenWelcome" class="tropical-card w-full p-5 sm:p-8 text-center my-4 transition-all duration-300">
+            <div class="inline-block bg-amber-100 text-amber-800 text-xs uppercase font-extrabold px-4 py-1 rounded-full mb-3 border border-amber-400">
+                Juego Educativo de Obstetricia
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-extrabold font-fredoka text-teal-800 mb-2">
+                ¡Misión Barrera Hawaiana! 🌊
+            </h2>
+            <p class="text-gray-700 text-base sm:text-lg max-w-2xl mx-auto mb-6">
+                Bienvenidas chicas al archipiélago de la salud sexual. Diseñado especialmente para <strong class="text-pink-600">mujeres en edad fértil</strong> para aprender de forma divertida sobre la <strong class="text-teal-700">Doble Protección</strong>: prevención de embarazo no deseado y de ITS (Infecciones de Transmisión Sexual).
+            </p>
+
+            <!-- Info Badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <div class="bg-pink-50 p-4 rounded-xl border-2 border-pink-200 flex flex-col items-center">
+                    <div class="text-3xl mb-2">🛡️</div>
+                    <h3 class="font-bold text-pink-800 text-sm mb-1">Doble Protección</h3>
+                    <p class="text-xs text-gray-600">El preservativo es el ÚNICO método que evita embarazos no deseados Y protege contra ITS al mismo tiempo.</p>
+                </div>
+
+                <div class="bg-teal-50 p-4 rounded-xl border-2 border-teal-200 flex flex-col items-center">
+                    <div class="text-3xl mb-2">🦠</div>
+                    <h3 class="font-bold text-teal-800 text-sm mb-1">Barrera vs. ITS</h3>
+                    <p class="text-xs text-gray-600">Previene la transmisión de VIH, VPH, Sífilis, Gonorrea, Clamidia y Hepatitis B.</p>
+                </div>
+
+                <div class="bg-amber-50 p-4 rounded-xl border-2 border-amber-200 flex flex-col items-center">
+                    <div class="text-3xl mb-2">👥</div>
+                    <h3 class="font-bold text-amber-800 text-sm mb-1">Modo 2 Jugadoras</h3>
+                    <p class="text-xs text-gray-600">Jueguen en el mismo teclado o pantalla táctil para superar los 3 niveles juntos.</p>
+                </div>
+            </div>
+
+            <!-- Players Setup -->
+            <div class="bg-white/80 p-4 rounded-2xl border-2 border-teal-300 max-w-xl mx-auto mb-6">
+                <h4 class="font-bold text-teal-900 mb-3 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-gamepad"></i> Controles del Juego (2 Jugadores):
+                </h4>
+                <div class="grid grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div class="bg-pink-100 p-2.5 rounded-lg border border-pink-300">
+                        <span class="font-bold text-pink-700 block mb-1">🌺 Jugadora 1 (Lilo)</span>
+                        <p class="text-gray-700">Teclas <kbd class="bg-white px-1 border rounded">W</kbd><kbd class="bg-white px-1 border rounded">A</kbd><kbd class="bg-white px-1 border rounded">S</kbd><kbd class="bg-white px-1 border rounded">D</kbd> / Botones en pantalla</p>
+                    </div>
+                    <div class="bg-teal-100 p-2.5 rounded-lg border border-teal-300">
+                        <span class="font-bold text-teal-700 block mb-1">💙 Jugador 2 (Stitch)</span>
+                        <p class="text-gray-700">Teclas de <kbd class="bg-white px-1 border rounded">Flechas ⬆️⬇️⬅️➡️</kbd> / Botones en pantalla</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="stitch-btn text-white text-xl font-fredoka px-10 py-4 rounded-full hover:scale-105 transition transform flex items-center justify-center gap-3 mx-auto cursor-pointer">
+                <i class="fa-solid fa-play"></i> ¡INICIAR MISIÓN DE 3 NIVELES!
+            </button>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY CONTAINER -->
+        <div id="screenGame" class="tropical-card w-full p-4 sm:p-6 hidden">
+            <!-- Level Bar -->
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-4 pb-3 border-b-2 border-amber-300">
+                <div>
+                    <span id="levelBadge" class="bg-amber-500 text-white font-fredoka text-sm px-3 py-1 rounded-full">
+                        Nivel 1 de 3
+                    </span>
+                    <h3 id="levelTitle" class="text-xl sm:text-2xl font-extrabold text-teal-900 font-fredoka inline ml-2">
+                        Cargando...
+                    </h3>
+                </div>
+                <div class="flex items-center gap-4 text-sm font-bold">
+                    <div class="bg-pink-100 border border-pink-400 px-3 py-1 rounded-lg text-pink-800">
+                        🌺 P1: <span id="scoreP1" class="text-pink-600 text-lg">0</span> pts
+                    </div>
+                    <div class="bg-teal-100 border border-teal-400 px-3 py-1 rounded-lg text-teal-800">
+                        💙 P2: <span id="scoreP2" class="text-teal-600 text-lg">0</span> pts
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Description / Objective Card -->
+            <div id="levelInstruction" class="bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-lg mb-4 text-xs sm:text-sm text-amber-900">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Dynamic Interactive Area (Canvas or Mini-game interface) -->
+            <div class="relative w-full flex flex-col items-center justify-center">
+                <!-- Canvas Game Area -->
+                <canvas id="gameCanvas" width="800" height="420" class="w-full h-auto max-w-full cursor-pointer"></canvas>
+
+                <!-- Interactive Sequencer for Level 2 (Hidden by default) -->
+                <div id="sequencerContainer" class="hidden w-full bg-teal-50/90 p-4 rounded-2xl border-2 border-teal-300">
+                    <p class="text-xs sm:text-sm font-semibold text-teal-900 text-center mb-3">
+                        📋 ¡Ambas jugadoras deben seleccionar en orden correcto los 7 pasos del uso adecuado del preservativo!
+                    </p>
+                    <div id="stepsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                        <!-- Step buttons generated by JS -->
+                    </div>
+                    <div id="sequencerFeedback" class="mt-4 p-3 rounded-lg text-center font-bold text-sm hidden"></div>
+                </div>
+
+                <!-- Touch Controls for Mobile 2-Player -->
+                <div class="w-full mt-4 grid grid-cols-2 gap-4 md:hidden">
+                    <!-- P1 Controls -->
+                    <div class="bg-pink-50/80 p-2 rounded-xl border border-pink-300 text-center">
+                        <span class="text-xs font-bold text-pink-700 block mb-1">Controles P1 (Lilo)</span>
+                        <div class="grid grid-cols-3 gap-1 max-w-[120px] mx-auto">
+                            <div></div>
+                            <button ontouchstart="p1Move('up')" class="bg-pink-400 text-white p-2 rounded text-xs">⬆️</button>
+                            <div></div>
+                            <button ontouchstart="p1Move('left')" class="bg-pink-400 text-white p-2 rounded text-xs">⬅️</button>
+                            <button ontouchstart="p1Move('down')" class="bg-pink-400 text-white p-2 rounded text-xs">⬇️</button>
+                            <button ontouchstart="p1Move('right')" class="bg-pink-400 text-white p-2 rounded text-xs">➡️</button>
+                        </div>
+                    </div>
+                    <!-- P2 Controls -->
+                    <div class="bg-teal-50/80 p-2 rounded-xl border border-teal-300 text-center">
+                        <span class="text-xs font-bold text-teal-700 block mb-1">Controles P2 (Stitch)</span>
+                        <div class="grid grid-cols-3 gap-1 max-w-[120px] mx-auto">
+                            <div></div>
+                            <button ontouchstart="p2Move('up')" class="bg-teal-500 text-white p-2 rounded text-xs">⬆️</button>
+                            <div></div>
+                            <button ontouchstart="p2Move('left')" class="bg-teal-500 text-white p-2 rounded text-xs">⬅️</button>
+                            <button ontouchstart="p2Move('down')" class="bg-teal-500 text-white p-2 rounded text-xs">⬇️</button>
+                            <button ontouchstart="p2Move('right')" class="bg-teal-500 text-white p-2 rounded text-xs">➡️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Educational Obstetric Tip Box -->
+            <div id="obstetricFactBox" class="mt-4 p-3 bg-pink-100/80 border border-pink-300 rounded-xl text-xs sm:text-sm text-pink-900 flex items-start gap-3">
+                <span class="text-2xl">👩‍⚕️️</span>
+                <div>
+                    <strong class="font-bold text-pink-950 block">Dato Obstétrico del Nivel:</strong>
+                    <span id="factText">El uso correcto y consistente del preservativo tiene una eficacia del 98% en la prevención de embarazos no planeados.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: EDUCATIONAL QUIZ / INTERMISSION MODAL -->
+        <div id="screenModal" class="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+            <div class="tropical-card max-w-xl w-full p-6 text-center animate-bounce-short">
+                <span class="text-4xl mb-2 block" id="modalEmoji">🎉</span>
+                <h3 id="modalTitle" class="text-2xl font-extrabold font-fredoka text-teal-900 mb-2">¡Nivel Completado!</h3>
+                <p id="modalBody" class="text-gray-700 text-sm sm:text-base mb-4">
+                    Has demostrado excelentes conocimientos en protección barrera.
+                </p>
+
+                <!-- Mini Obstetric Quiz in Modal -->
+                <div id="modalQuizContainer" class="bg-amber-50 p-4 rounded-xl border border-amber-300 mb-4 text-left">
+                    <p class="text-xs font-bold text-amber-800 uppercase mb-1">Pregunta Obstétrica del Nivel:</p>
+                    <p id="quizQuestion" class="font-bold text-teal-900 text-sm mb-3">¿Por qué el preservativo es superior a otros métodos anticonceptivos para mujeres jóvenes?</p>
+                    <div id="quizOptions" class="space-y-2 text-xs sm:text-sm">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <button id="modalActionBtn" onclick="nextLevelOrFinish()" class="stitch-btn text-white font-fredoka px-8 py-3 rounded-full hover:scale-105 transition">
+                    Continuar al Siguiente Nivel ➡️
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: FINAL VICTORY & OBSTETRIC CERTIFICATE -->
+        <div id="screenVictory" class="tropical-card w-full p-6 sm:p-10 text-center hidden">
+            <span class="text-6xl mb-3 block">👑🌺</span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold font-fredoka text-teal-900 mb-2">
+                ¡Misión Hawaiana Cumplida!
+            </h2>
+            <p class="text-lg text-pink-700 font-semibold mb-4">
+                ¡Felicidades! Han completado los 3 niveles con éxito.
+            </p>
+
+            <!-- Final Score Summary -->
+            <div class="bg-amber-100/80 p-4 rounded-2xl border-2 border-amber-400 max-w-md mx-auto mb-6 grid grid-cols-2 gap-4">
+                <div>
+                    <span class="text-xs uppercase font-bold text-pink-700">Jugadora 1 (Lilo)</span>
+                    <p class="text-2xl font-bold font-fredoka text-pink-900" id="finalP1">0 pts</p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-bold text-teal-700">Jugador 2 (Stitch)</span>
+                    <p class="text-2xl font-bold font-fredoka text-teal-900" id="finalP2">0 pts</p>
+                </div>
+            </div>
+
+            <!-- Summary Educational Infographic for Women of Childbearing Age -->
+            <div class="bg-white p-5 rounded-2xl border-2 border-teal-300 text-left text-xs sm:text-sm space-y-3 mb-6 max-w-2xl mx-auto shadow-inner">
+                <h4 class="font-bold text-teal-900 text-base text-center border-b pb-2">
+                    📖 Resumen de Salud Obstétrica: Puntos Clave para la Mujer
+                </h4>
+                <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                    <li><strong class="text-pink-700">Doble Protección:</strong> Combina el preservativo (barrera de ITS) con un método hormonal o DIU para máxima eficacia anticonceptiva y preventiva.</li>
+                    <li><strong class="text-teal-700">Prevención de ITS:</strong> Protege contra la transmisión de virus persistentes como el VPH (causante de cáncer cérvico-uterino) y el VIH.</li>
+                    <li><strong class="text-amber-700">Preservativo Femenino:</strong> Es una excelente alternativa controlada directamente por la mujer, brindando autonomía e igual protección barrera.</li>
+                    <li><strong class="text-purple-700">Uso Correcto:</strong> Verificar empaque con colchón de aire, fecha de caducidad, usar lubricante acuoso y retirar tomándolo de la base.</li>
+                </ul>
+            </div>
+
+            <button onclick="restartGame()" class="lilo-btn text-white text-lg font-fredoka px-8 py-3 rounded-full hover:scale-105 transition cursor-pointer">
+                <i class="fa-solid fa-rotate-right"></i> Volver a Jugar
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-3 bg-teal-950 text-teal-300 text-center text-xs border-t-2 border-amber-400">
+        <p>🌺 Juego Interactivo de Obstetricia | Educación en Salud Sexual y Reproductiva para Mujeres en Edad Fértil</p>
+    </footer>
+
+    <script>
+        /* GAME STATE VARIABLES */
+        let currentLevel = 1;
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+        let soundEnabled = true;
+        let gameLoopReq = null;
+
+        // Player Objects for Canvas Games
+        const p1 = { x: 150, y: 200, radius: 20, color: '#ff4d6d', speed: 6, label: 'Lilo 🌺' };
+        const p2 = { x: 150, y: 260, radius: 20, color: '#00b4d8', speed: 6, label: 'Stitch 💙' };
+
+        // Key states
+        const keys = {};
+
+        // Level 1 Objects (Bubbles / Collectibles)
+        let level1Items = [];
+
+        // Level 2 Sequencer State
+        const correctSteps = [
+            "1. Revisar fecha de vencimiento y burbuja de aire en el empaque",
+            "2. Abrir la envoltura con las yemas de los dedos (no dientes ni tijeras)",
+            "3. Verificar que el rollo esté hacia afuera antes de colocarlo",
+            "4. Apretar la punta (reservorio) para sacar el aire atrapado",
+            "5. Desenrollar suavemente hasta la base del pene erecto",
+            "6. Usar lubricante a base de agua (no vaselina ni aceites)",
+            "7. Retirar sosteniendo firmemente la base inmediatamente tras eyacular"
+        ];
+        let currentSequenceProgress = [];
+
+        // Level 3 Defense Game Objects
+        let spermAndPathogens = [];
+
+        // Audio synth setup
+        let synth = null;
+        try {
+            synth = new Tone.Synth().toDestination();
+        } catch(e) {
+            console.log("Audio non-critical initialization fallback");
+        }
+
+        function playSound(freq = "C5", duration = "8n") {
+            if (soundEnabled && synth) {
+                try {
+                    Tone.start();
+                    synth.triggerAttackRelease(freq, duration);
+                } catch(e) {}
+            }
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById("audioIcon");
+            if (soundEnabled) {
+                icon.className = "fa-solid fa-volume-high";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+            }
+        }
+
+        /* INPUT LISTENERS */
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            keys[e.key] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+            keys[e.key] = false;
+        });
+
+        /* MOBILE CONTROLS */
+        function p1Move(dir) {
+            if (dir === 'up') p1.y -= 25;
+            if (dir === 'down') p1.y += 25;
+            if (dir === 'left') p1.x -= 25;
+            if (dir === 'right') p1.x += 25;
+        }
+
+        function p2Move(dir) {
+            if (dir === 'up') p2.y -= 25;
+            if (dir === 'down') p2.y += 25;
+            if (dir === 'left') p2.x -= 25;
+            if (dir === 'right') p2.x += 25;
+        }
+
+        function startGame() {
+            document.getElementById('screenWelcome').classList.add('hidden');
+            document.getElementById('screenVictory').classList.add('hidden');
+            document.getElementById('screenGame').classList.remove('hidden');
+            
+            scoreP1 = 0;
+            scoreP2 = 0;
+            currentLevel = 1;
+            updateScoreDisplay();
+            initLevel(1);
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scoreP1').innerText = scoreP1;
+            document.getElementById('scoreP2').innerText = scoreP2;
+        }
+
+        function initLevel(lvl) {
+            currentLevel = lvl;
+            const canvas = document.getElementById('gameCanvas');
+            const sequencer = document.getElementById('sequencerContainer');
+            
+            if (gameLoopReq) cancelAnimationFrame(gameLoopReq);
+
+            if (lvl === 1) {
+                canvas.classList.remove('hidden');
+                sequencer.classList.add('hidden');
+                document.getElementById('levelBadge').innerText = "Nivel 1 de 3";
+                document.getElementById('levelTitle').innerText = "Atrapa la Doble Protección & Esquiva Mitos";
+                document.getElementById('levelInstruction').innerHTML = "<strong>Misión:</strong> P1 (WASD) y P2 (Flechas) recolecten los <strong>Preservativos 🛡️</strong> y <strong>Barreras de ITS 🦠</strong>. ¡Eviten las burbujas de mitos erróneos!";
+                document.getElementById('factText').innerText = "El preservativo masculino y el preservativo femenino son los únicos métodos anticonceptivos que ofrecen prevención simultánea de ITS como el VIH, VPH y Sífilis.";
+                
+                // Initialize items for Level 1
+                level1Items = [];
+                for (let i = 0; i < 7; i++) {
+                    spawnLevel1Item();
+                }
+                
+                p1.x = 100; p1.y = 150;
+                p2.x = 100; p2.y = 270;
+                runLevel1Loop();
+
+            } else if (lvl === 2) {
+                canvas.classList.add('hidden');
+                sequencer.classList.remove('hidden');
+                document.getElementById('levelBadge').innerText = "Nivel 2 de 3";
+                document.getElementById('levelTitle').innerText = "La Secuencia Perfecta del Uso Correcto";
+                document.getElementById('levelInstruction').innerHTML = "<strong>Misión Cooperativa:</strong> Hagan clic en las tarjetas para ordenar los 7 pasos correctos para colocar y retirar un preservativo de forma segura.";
+                document.getElementById('factText').innerText = "Incluso con un método anticonceptivo hormonal (como pastillas o inyecciones), la obstetricia recomienda el uso del preservativo (Doble Protección) para prevenir ITS.";
+                
+                setupLevel2Sequencer();
+
+            } else if (lvl === 3) {
+                canvas.classList.remove('hidden');
+                sequencer.classList.add('hidden');
+                document.getElementById('levelBadge').innerText = "Nivel 3 de 3";
+                document.getElementById('levelTitle').innerText = "El Gran Escudo Hawaiano contra Riesgos";
+                document.getElementById('levelInstruction').innerHTML = "<strong>Misión Arcade:</strong> Muevan sus avatares para colocar el <strong>Escudo de Barrera</strong> y bloquear la oleada de espermatozoides y patógenos hacia la zona protegida.";
+                document.getElementById('factText').innerText = "El Preservativo Femenino es de nitrilo o poliuretano, se inserta en la vagina y otorga a la mujer autonomía total en su protección reproductiva.";
+                
+                spermAndPathogens = [];
+                for (let i = 0; i < 8; i++) {
+                    spawnPathogen();
+                }
+
+                p1.x = 650; p1.y = 150;
+                p2.x = 650; p2.y = 270;
+                runLevel3Loop();
+            }
+        }
+
+        function spawnLevel1Item() {
+            const types = [
+                { type: 'good', label: 'Preservativo 🛡️', points: 10, color: '#2a9d8f' },
+                { type: 'good', label: 'Escudo ITS 🩺', points: 10, color: '#00b4d8' },
+                { type: 'good', label: 'Lubricante Acuoso 💧', points: 15, color: '#48cae4' },
+                { type: 'bad', label: 'Mito: "Doble Condón" ❌', points: -10, color: '#e76f51' },
+                { type: 'bad', label: 'Mito: "Vaselina" ❌', points: -10, color: '#f4a261' }
+            ];
+            const item = types[Math.floor(Math.random() * types.length)];
+            level1Items.push({
+                x: 800 + Math.random() * 200,
+                y: 50 + Math.random() * 320,
+                speed: 2 + Math.random() * 3,
+                radius: 22,
+                ...item
+            });
+        }
+
+        function runLevel1Loop() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Handle Movements
+            if (keys['w'] || keys['W']) p1.y -= p1.speed;
+            if (keys['s'] || keys['S']) p1.y += p1.speed;
+            if (keys['a'] || keys['A']) p1.x -= p1.speed;
+            if (keys['d'] || keys['D']) p1.x += p1.speed;
+
+            if (keys['ArrowUp']) p2.y -= p2.speed;
+            if (keys['ArrowDown']) p2.y += p2.speed;
+            if (keys['ArrowLeft']) p2.x -= p2.speed;
+            if (keys['ArrowRight']) p2.x += p2.speed;
+
+            // Constrain
+            [p1, p2].forEach(p => {
+                p.x = Math.max(p.radius, Math.min(canvas.width - p.radius, p.x));
+                p.y = Math.max(p.radius, Math.min(canvas.height - p.radius, p.y));
+            });
+
+            // Draw Background & Water FX
+            ctx.fillStyle = '#caf0f8';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Palm silhouettes in background
+            ctx.fillStyle = 'rgba(2, 128, 144, 0.15)';
+            ctx.beginPath();
+            ctx.arc(0, 420, 150, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw Items
+            level1Items.forEach((item, index) => {
+                item.x -= item.speed;
+
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Nunito';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.label, item.x, item.y + 4);
+
+                // Collision with P1
+                if (checkCollision(p1, item)) {
+                    scoreP1 += item.points;
+                    playSound(item.type === 'good' ? "G5" : "C3");
+                    level1Items.splice(index, 1);
+                    spawnLevel1Item();
+                    updateScoreDisplay();
+                }
+                // Collision with P2
+                else if (checkCollision(p2, item)) {
+                    scoreP2 += item.points;
+                    playSound(item.type === 'good' ? "E5" : "C3");
+                    level1Items.splice(index, 1);
+                    spawnLevel1Item();
+                    updateScoreDisplay();
+                }
+
+                // Respawn out of bounds
+                if (item.x < -30) {
+                    level1Items.splice(index, 1);
+                    spawnLevel1Item();
+                }
+            });
+
+            // Draw Players
+            drawPlayer(ctx, p1);
+            drawPlayer(ctx, p2);
+
+            // Win condition Level 1
+            if (scoreP1 + scoreP2 >= 120) {
+                playSound("C6", "4n");
+                showModal(
+                    "¡Marea de Mitos Superada! 🌺",
+                    "Excelente trabajo en equipo. Han aprendido a identificar las barreras verdaderas de salud de los mitos perjudiciales.",
+                    "¿Cuál es una regla fundamental para garantizar la eficacia del preservativo?",
+                    [
+                        { txt: "Verificar la fecha de vencimiento y que el empaque tenga aire", correct: true },
+                        { txt: "Usar dos preservativos al mismo tiempo para doble seguridad", correct: false },
+                        { txt: "Reutilizarlo si se lava adecuadamente con agua", correct: false }
+                    ]
+                );
+                return;
+            }
+
+            gameLoopReq = requestAnimationFrame(runLevel1Loop);
+        }
+
+        function setupLevel2Sequencer() {
+            currentSequenceProgress = [];
+            const grid = document.getElementById('stepsGrid');
+            const feedback = document.getElementById('sequencerFeedback');
+            feedback.classList.add('hidden');
+            grid.innerHTML = '';
+
+            // Shuffle steps
+            const shuffled = [...correctSteps].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((stepText) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white hover:bg-teal-100 border-2 border-teal-400 p-3 rounded-xl font-bold text-teal-900 text-left transition transform hover:scale-[1.02] active:scale-95 shadow-sm";
+                btn.innerText = stepText;
+                btn.onclick = () => handleStepClick(btn, stepText);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleStepClick(btn, stepText) {
+            const expectedNextIndex = currentSequenceProgress.length;
+            const expectedStep = correctSteps[expectedNextIndex];
+
+            if (stepText === expectedStep) {
+                // Correct step chosen
+                playSound("E5", "8n");
+                btn.className = "bg-emerald-500 text-white border-2 border-emerald-600 p-3 rounded-xl font-bold text-left cursor-default shadow-md";
+                btn.onclick = null;
+                currentSequenceProgress.push(stepText);
+                scoreP1 += 15;
+                scoreP2 += 15;
+                updateScoreDisplay();
+
+                if (currentSequenceProgress.length === correctSteps.length) {
+                    // Level 2 Completed
+                    playSound("G6", "4n");
+                    const feedback = document.getElementById('sequencerFeedback');
+                    feedback.className = "mt-4 p-3 rounded-lg text-center font-bold text-sm bg-emerald-100 text-emerald-900 border border-emerald-400";
+                    feedback.innerText = "¡Perfecto! Han ordenado correctamente todos los pasos recomendados por obstetricia.";
+                    feedback.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        showModal(
+                            "¡Secuencia Perfecta Completada! 📋",
+                            "Saber colocar y retirar el preservativo correctamente asegura una protección cercana al 98%.",
+                            "¿Qué tipo de lubricante se debe usar exclusivamente con preservativos de látex?",
+                            [
+                                { txt: "Lubricante a base de agua o silicona", correct: true },
+                                { txt: "Aceite de bebé o vaselina", correct: false },
+                                { txt: "Cualquier crema corporal humectante", correct: false }
+                            ]
+                        );
+                    }, 1200);
+                }
+            } else {
+                // Error in sequence
+                playSound("C3", "8n");
+                btn.classList.add('animate-shake', 'bg-red-200');
+                setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-200'), 500);
+            }
+        }
+
+        function spawnPathogen() {
+            const types = [
+                { name: 'Espermatozoide 🧬', color: '#f4a261', speed: 2.5 },
+                { name: 'Riesgo ITS (VPH) 🦠', color: '#e76f51', speed: 3 },
+                { name: 'Riesgo ITS (VIH) 🦠', color: '#d62828', speed: 3.2 }
+            ];
+            const p = types[Math.floor(Math.random() * types.length)];
+            spermAndPathogens.push({
+                x: 0,
+                y: 40 + Math.random() * 340,
+                radius: 18,
+                ...p
+            });
+        }
+
+        function runLevel3Loop() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Handle Movements
+            if (keys['w'] || keys['W']) p1.y -= p1.speed;
+            if (keys['s'] || keys['S']) p1.y += p1.speed;
+            if (keys['a'] || keys['A']) p1.x -= p1.speed;
+            if (keys['d'] || keys['D']) p1.x += p1.speed;
+
+            if (keys['ArrowUp']) p2.y -= p2.speed;
+            if (keys['ArrowDown']) p2.y += p2.speed;
+            if (keys['ArrowLeft']) p2.x -= p2.speed;
+            if (keys['ArrowRight']) p2.x += p2.speed;
+
+            [p1, p2].forEach(p => {
+                p.x = Math.max(300, Math.min(canvas.width - p.radius, p.x));
+                p.y = Math.max(p.radius, Math.min(canvas.height - p.radius, p.y));
+            });
+
+            // Draw Canvas Background - Reproductive Zone Protection
+            ctx.fillStyle = '#f7d6e0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Safe Zone
+            ctx.fillStyle = '#b7e4c7';
+            ctx.fillRect(700, 0, 100, canvas.height);
+            ctx.fillStyle = '#2d6a4f';
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('ZONA DE SALUD', 750, 20);
+
+            // Draw Condom Shield Barrier line attached to players
+            ctx.strokeStyle = '#00b4d8';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+            // Label for condom shield
+            ctx.fillStyle = '#03045e';
+            ctx.font = 'bold 12px Fredoka';
+            ctx.fillText('ESCUDO PRESERVATIVO (DOBLE PROTECCIÓN)', (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 12);
+
+            // Update & Draw Pathogens/Sperm
+            spermAndPathogens.forEach((item, index) => {
+                item.x += item.speed;
+
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '9px Nunito';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.name, item.x, item.y + 3);
+
+                // Check collision with Condom Shield Line
+                if (lineIntersectsCircle(p1, p2, item)) {
+                    playSound("G5", "8n");
+                    scoreP1 += 10;
+                    scoreP2 += 10;
+                    updateScoreDisplay();
+                    spermAndPathogens.splice(index, 1);
+                    spawnPathogen();
+                }
+                // Check if reached safe zone (Failed block)
+                else if (item.x > 700) {
+                    playSound("C3", "8n");
+                    spermAndPathogens.splice(index, 1);
+                    spawnPathogen();
+                }
+            });
+
+            // Draw Players
+            drawPlayer(ctx, p1);
+            drawPlayer(ctx, p2);
+
+            // Win Condition Level 3
+            if (scoreP1 + scoreP2 >= 350) {
+                playSound("C6", "2n");
+                showModal(
+                    "¡Escudo de Doble Protección Victorioso! 🛡️🌺",
+                    "Han protegido con éxito la salud reproductiva impidiendo embarazos no deseados e infecciones de transmisión sexual.",
+                    "¿Cuál es el beneficio de la autonomía de la mujer con el preservativo femenino?",
+                    [
+                        { txt: "Permite a la mujer decidir e iniciar su propia protección sin depender de su pareja", correct: true },
+                        { txt: "Solo se puede utilizar durante los días de ovulación", correct: false },
+                        { txt: "No requiere ningún tipo de lubricación", correct: false }
+                    ]
+                );
+                return;
+            }
+
+            gameLoopReq = requestAnimationFrame(runLevel3Loop);
+        }
+
+        /* HELPER DRAWING AND MATH FUNCTIONS */
+        function drawPlayer(ctx, p) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px Fredoka';
+            ctx.textAlign = 'center';
+            ctx.fillText(p.label, p.x, p.y - p.radius - 4);
+        }
+
+        function checkCollision(circle1, circle2) {
+            const dx = circle1.x - circle2.x;
+            const dy = circle1.y - circle2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < circle1.radius + circle2.radius;
+        }
+
+        function lineIntersectsCircle(p1, p2, c) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if (len === 0) return false;
+
+            const u = ((c.x - p1.x) * dx + (c.y - p1.y) * dy) / (len * len);
+            const clampedU = Math.max(0, Math.min(1, u));
+
+            const nearestX = p1.x + clampedU * dx;
+            const nearestY = p1.y + clampedU * dy;
+
+            const distX = c.x - nearestX;
+            const distY = c.y - nearestY;
+
+            return (distX * distX + distY * distY) < (c.radius + 10) * (c.radius + 10);
+        }
+
+        function showModal(title, bodyText, quizQ, options) {
+            document.getElementById('screenModal').classList.remove('hidden');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerText = bodyText;
+            document.getElementById('quizQuestion').innerText = quizQ;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-lg border border-amber-300 bg-white hover:bg-amber-100 font-semibold text-teal-900 transition flex items-center gap-2";
+                btn.innerHTML = `<i class="fa-regular fa-circle text-amber-500"></i> ${opt.txt}`;
+                btn.onclick = () => {
+                    if (opt.correct) {
+                        playSound("E5", "8n");
+                        btn.className = "w-full text-left p-2.5 rounded-lg border border-emerald-500 bg-emerald-100 font-bold text-emerald-900";
+                        btn.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ¡Correcto! (+20 pts extra)`;
+                        scoreP1 += 10;
+                        scoreP2 += 10;
+                        updateScoreDisplay();
+                    } else {
+                        playSound("C3", "8n");
+                        btn.className = "w-full text-left p-2.5 rounded-lg border border-rose-400 bg-rose-100 font-bold text-rose-900";
+                        btn.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i> Repasa la información obstétrica`;
+                    }
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function nextLevelOrFinish() {
+            document.getElementById('screenModal').classList.add('hidden');
+            if (currentLevel < 3) {
+                initLevel(currentLevel + 1);
+            } else {
+                // Game Finished - Victory screen
+                document.getElementById('screenGame').classList.add('hidden');
+                document.getElementById('screenVictory').classList.remove('hidden');
+                document.getElementById('finalP1').innerText = `${scoreP1} pts`;
+                document.getElementById('finalP2').innerText = `${scoreP2} pts`;
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('screenVictory').classList.add('hidden');
+            document.getElementById('screenWelcome').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
